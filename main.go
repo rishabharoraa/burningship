@@ -38,12 +38,25 @@ func CalculateIterations(x, y float64, maxIterations int) int {
 	return iters
 }
 
+func MapRange(input, oldMin, oldMax, newMin, newMax uint8) uint8 {
+	return uint8(((float64(input)-float64(oldMin))*(float64(newMax)-float64(newMin)))/(float64(oldMax)-float64(oldMin)) + float64(newMin))
+}
+
+func ApplyFilter(shade, fr, fg, fb uint8) (uint8, uint8, uint8) {
+
+	_r := MapRange(shade, 0, 255, fr, 255)
+	_g := MapRange(shade, 0, 255, fg, 255)
+	_b := MapRange(shade, 0, 255, fb, 255)
+	return _r, _g, _b
+}
+
 func ComputeColor(num int, maxIterations int) (uint8, uint8, uint8) {
+	var fr, fg, fb uint8 = 188, 74, 60
 	if num == maxIterations {
-		return 0, 0, 0
+		return fr, fg, fb
 	}
 	shade := 255 - uint8(num*2%255)
-	return shade, shade, shade
+	return ApplyFilter(shade, fr, fg, fb)
 }
 
 func Paint(points [][]int, maxIterations int) {
