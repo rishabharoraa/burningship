@@ -51,7 +51,7 @@ func ApplyFilter(shade, fr, fg, fb uint8) (uint8, uint8, uint8) {
 }
 
 func ComputeColor(num int, maxIterations int) (uint8, uint8, uint8) {
-	var fr, fg, fb uint8 = 188, 74, 60
+	var fr, fg, fb uint8 = 0, 0, 0
 	if num == maxIterations {
 		return fr, fg, fb
 	}
