@@ -47,7 +47,7 @@ func ApplyFilter(shade, fr, fg, fb uint8) (uint8, uint8, uint8) {
 	_r := MapRange(shade, 0, 255, fr, 255)
 	_g := MapRange(shade, 0, 255, fg, 255)
 	_b := MapRange(shade, 0, 255, fb, 255)
-	return _r, _g, _b
+	return (_r*2 + 3) % 255, (_g*2 + 3) % 255, (_b*2 + 3) % 255
 }
 
 func ComputeColor(num int, maxIterations int) (uint8, uint8, uint8) {
