@@ -7,14 +7,16 @@ import (
 	"math"
 	"math/cmplx"
 	"os"
+
+	"github.com/nfnt/resize"
 )
 
 const CENTER complex128 = -1.75 - 0.03i
 const SIZE float64 = 0.06
 
-const RESOLUTION int = 4096
+const RESOLUTION int = 16384
 
-const MAX_ITERATIONS int = 128
+const MAX_ITERATIONS int = 72
 
 func CalculateStep(size float64, resolution int) float64 {
 	return (2 * size / float64(resolution))
@@ -38,24 +40,27 @@ func CalculateIterations(x, y float64, maxIterations int) int {
 	return iters
 }
 
-func MapRange(input, oldMin, oldMax, newMin, newMax uint8) uint8 {
+func MapRange(input, oldMin, oldMax int, newMin, newMax uint8) uint8 {
 	return uint8(((float64(input)-float64(oldMin))*(float64(newMax)-float64(newMin)))/(float64(oldMax)-float64(oldMin)) + float64(newMin))
 }
 
 func ApplyFilter(shade, fr, fg, fb uint8) (uint8, uint8, uint8) {
 
-	_r := MapRange(shade, 0, 255, fr, 255)
-	_g := MapRange(shade, 0, 255, fg, 255)
-	_b := MapRange(shade, 0, 255, fb, 255)
-	return (_r*2 + 3) % 255, (_g*2 + 3) % 255, (_b*2 + 3) % 255
+	_r := MapRange(int(shade), 0, 255, 114, 20)
+	_g := MapRange(int(shade), 0, 255, 31, 28)
+	_b := MapRange(int(shade), 0, 255, 9, 60)
+	return _r, _g, _b
 }
 
 func ComputeColor(num int, maxIterations int) (uint8, uint8, uint8) {
 	var fr, fg, fb uint8 = 64, 64, 64
 	if num == maxIterations {
-		return fr, fg, fb
+		return 0, 0, 0
 	}
-	shade := 255 - uint8(num*2%255)
+	if num > int(float64(maxIterations)*0.4) {
+		return 159, 43, 12
+	}
+	shade := MapRange(num, 0, maxIterations, 255, 0)
 	return ApplyFilter(shade, fr, fg, fb)
 	// return uint8(255 - num*4), uint8(255 - num*4), uint8(255 - num*4)
 }
@@ -78,7 +83,8 @@ func Paint(points [][]int, maxIterations int) {
 		}
 	}
 	file, _ := os.Create("burningShip.png")
-	png.Encode(file, img)
+	resizedImg := resize.Resize(1024, 1024, img, resize.Lanczos3)
+	png.Encode(file, resizedImg)
 }
 
 func Plot(center complex128, size float64, resolution int, maxIterations int) {
