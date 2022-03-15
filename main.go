@@ -12,9 +12,9 @@ import (
 const CENTER complex128 = -1.75 - 0.03i
 const SIZE float64 = 0.06
 
-const RESOLUTION int = 2048
+const RESOLUTION int = 4096
 
-const MAX_ITERATIONS int = 2048
+const MAX_ITERATIONS int = 128
 
 func CalculateStep(size float64, resolution int) float64 {
 	return (2 * size / float64(resolution))
@@ -51,12 +51,13 @@ func ApplyFilter(shade, fr, fg, fb uint8) (uint8, uint8, uint8) {
 }
 
 func ComputeColor(num int, maxIterations int) (uint8, uint8, uint8) {
-	var fr, fg, fb uint8 = 0, 0, 0
+	var fr, fg, fb uint8 = 64, 64, 64
 	if num == maxIterations {
 		return fr, fg, fb
 	}
 	shade := 255 - uint8(num*2%255)
 	return ApplyFilter(shade, fr, fg, fb)
+	// return uint8(255 - num*4), uint8(255 - num*4), uint8(255 - num*4)
 }
 
 func Paint(points [][]int, maxIterations int) {
